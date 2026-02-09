@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/jp_ruby"
+require "optparse"
+
+options = {}
+parser = OptionParser.new do |opts|
+  opts.banner = "使い方: jp-ruby [オプション] <ファイル.jrb>"
+  opts.version = JpRuby::VERSION
+
+  opts.on("--dump", "変換されたRubyコードを表示する") do
+    options[:dump] = true
+  end
+
+  opts.on("-e CODE", "コマンドラインからjp-rubyコードを実行する") do |code|
+    options[:eval] = code
+  end
+
+  opts.on("-v", "--version", "バージョンを表示する") do
+    puts "jp-ruby #{JpRuby::VERSION}"
+    exit
+  end
+
+  opts.on("-h", "--help", "ヘルプを表示する") do
+    puts opts
+    exit
+  end
+end
+
+parser.parse!
+
+if options[:eval]
+  transpiler = JpRuby::Transpiler.new(options[:eval], filename: "-e")
+  ruby_code = transpiler.transpile
+  JpRuby::Runtime.load!
+  if options[:dump]
+    puts ruby_code
+  else
+    eval(ruby_code, TOPLEVEL_BINDING, "-e", 1) # rubocop:disable Security/Eval
+  end
+elsif ARGV.empty?
+  puts parser
+  exit 1
+else
+  filename = ARGV[0]
+  unless File.exist?(filename)
+    $stderr.puts "エラー: ファイルが見つかりません: #{filename}"
+    exit 1
+  end
+  JpRuby::Runner.new(filename, options).run
+end
