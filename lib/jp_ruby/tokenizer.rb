@@ -397,6 +397,16 @@ module JpRuby
 
     # --- Helpers ---
 
+    # Ruby keywords after which / starts a regex (not division)
+    REGEX_PRECEDING_KEYWORDS = %w[
+      if elsif else unless case when then do in while until for
+      begin rescue ensure return next break yield and or not
+      def class module
+      もし そうでなければ でなければ でない限り 場合 条件 そして する 中の
+      繰り返す まで 繰り返し 始まり 救済 確保 戻す 次へ 中断 譲る
+      かつ または ではない 定義 クラス モジュール
+    ].freeze
+
     def regex_possible?
       # Regex is possible if the previous non-space token is not an identifier,
       # number, closing bracket, or similar
@@ -405,8 +415,8 @@ module JpRuby
 
       case prev.type
       when :word
-        # After a keyword, regex is possible
-        true
+        # After a keyword, regex is possible; after a variable/method name, it is division
+        REGEX_PRECEDING_KEYWORDS.include?(prev.value)
       when :other
         !prev.value.match?(/[\w\d)\]}>]$/)
       else
