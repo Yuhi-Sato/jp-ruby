@@ -304,6 +304,10 @@ RSpec.describe JpRuby::Transpiler do
       expect(transpile("クラス Dog\n終わり")).to eq("class Dog\nend")
     end
 
+    it "大文字で始まる英語クラス名にはCを付与しない" do
+      expect(transpile("クラス Dog\n終わり")).to eq("class Dog\nend")
+    end
+
     it "複数のクラスを扱う" do
       source = "クラス 動物\n終わり\nクラス 犬\n終わり\nクラス 猫\n終わり"
       result = transpile(source)

@@ -36,8 +36,8 @@ module JpRuby
           j += 1 while j < tokens.length && tokens[j].type == :space
           if j < tokens.length && tokens[j].type == :word
             name = tokens[j].value
-            # Only add if it starts with a non-ASCII character (Japanese)
-            class_names << name if name.match?(/\A[^\x00-\x7F]/)
+            # Only add if it wouldn't be a valid Ruby constant (doesn't start with A-Z)
+            class_names << name unless name.match?(/\A[A-Z]/)
           end
         end
         i += 1
