@@ -14,7 +14,6 @@ module JpRuby
     def transpile
       tokens = Tokenizer.new(@source).tokenize
       class_names = collect_class_names(tokens)
-      class_names.sort_by! { |n| -n.length }
 
       tokens.map do |token|
         if token.type == :word

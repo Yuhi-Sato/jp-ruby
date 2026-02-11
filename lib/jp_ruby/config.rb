@@ -51,8 +51,7 @@ module JpRuby
         base[new_japanese] = english
       end
 
-      # Re-sort by key length descending (critical for correct transpilation)
-      base.sort_by { |k, _| -k.length }.to_h.freeze
+      base.to_h.freeze
     end
 
     # Build CLASS_DECLARATION_KEYWORDS based on current keyword map

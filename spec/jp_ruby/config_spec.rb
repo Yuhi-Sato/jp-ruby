@@ -175,20 +175,6 @@ RSpec.describe JpRuby::Config do
       end
     end
 
-    it "キー長降順でソートされる" do
-      Dir.mktmpdir do |dir|
-        path = write_config(dir, "Keyword:\n  class: とても長いクラス名")
-        config = described_class.new(path)
-        keyword_map = config.build_keyword_map
-
-        keys = keyword_map.keys
-        # 各キーは前のキー以下の長さであること
-        keys.each_cons(2) do |a, b|
-          expect(a.length).to be >= b.length
-        end
-      end
-    end
-
     it "日本語キーワードの重複でConfigErrorを発生" do
       Dir.mktmpdir do |dir|
         # 「真」はデフォルトでtrueに割り当て済み。ifにも「真」を指定すると重複する

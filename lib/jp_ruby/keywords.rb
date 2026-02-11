@@ -3,7 +3,7 @@
 module JpRuby
   module Keywords
     # Japanese to Ruby keyword mapping (default, immutable)
-    # Sorted by length (longest first) to prevent partial matches during replacement
+    # Word-based matching: tokenizer produces whole words, transpiler uses hash lookup.
     DEFAULT_KEYWORD_MAP = {
       # 7+ chars
       "そうでなければ" => "elsif",
@@ -91,7 +91,7 @@ module JpRuby
 
       # Block parameters
       "それ" => "it",
-    }.sort_by { |k, _| -k.length }.to_h.freeze
+    }.to_h.freeze
 
     # Default class declaration keywords
     DEFAULT_CLASS_DECLARATION_KEYWORDS = %w[クラス モジュール].freeze
