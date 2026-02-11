@@ -2,9 +2,13 @@
 
 module JpRuby
   class Transpiler
-    def initialize(source, filename: "(jp-ruby)")
+    def initialize(source, filename: "(jp-ruby)",
+                   keyword_map: Keywords::DEFAULT_KEYWORD_MAP,
+                   class_declaration_keywords: Keywords::DEFAULT_CLASS_DECLARATION_KEYWORDS)
       @source = source
       @filename = filename
+      @keyword_map = keyword_map
+      @class_declaration_keywords = class_declaration_keywords
     end
 
     def transpile
@@ -27,7 +31,7 @@ module JpRuby
       class_names = []
       i = 0
       while i < tokens.length
-        if tokens[i].type == :word && Keywords::CLASS_DECLARATION_KEYWORDS.include?(tokens[i].value)
+        if tokens[i].type == :word && @class_declaration_keywords.include?(tokens[i].value)
           # Skip spaces, find the next word token
           j = i + 1
           j += 1 while j < tokens.length && tokens[j].type == :space
@@ -49,7 +53,7 @@ module JpRuby
       end
 
       # Check if this word matches a keyword
-      if (english = Keywords::KEYWORD_MAP[word])
+      if (english = @keyword_map[word])
         return english
       end
 

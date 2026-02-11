@@ -1,0 +1,40 @@
+# jp-ruby カスタムキーワード設定ファイルのサンプル
+#
+# このファイルを .jp-ruby.yml という名前でプロジェクトのルートに配置するか、
+# --config オプションで指定してください。
+#
+# 使い方:
+#   bundle exec ruby exe/jp-ruby --config examples/.jp-ruby.yml examples/hello_world.jrb
+
+# Keywordセクション: Rubyキーワードの日本語名を上書き
+# 形式: 英語キーワード: カスタム日本語名
+# 注意: 上書きするとデフォルトの日本語名は無効になります
+#
+# Keyword:
+#   class: 組
+#   def: メソッド定義
+#   end: 以上
+#   if: もしも
+#   else: それ以外
+#   puts: 印字
+
+# ランタイムセクション: 組み込みクラスのメソッドエイリアスを上書き
+# 形式: 英語メソッド名: カスタム日本語名
+# 対応クラス: Array, Hash, String, Integer, Float, Object, Kernel
+#
+# Array:
+#   each: それぞれの要素
+#   map: 写像
+#   select: 選び出す
+#
+# Hash:
+#   keys: 鍵リスト
+#
+# String:
+#   length: 文字数
+#
+# Integer:
+#   times: 回繰り返す
+#
+# Kernel:
+#   puts: 印字

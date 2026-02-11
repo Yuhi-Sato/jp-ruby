@@ -8,8 +8,20 @@ module JpRuby
     end
 
     def run
+      # Discover and load config
+      config_path = Config.discover(
+        input_file: @filename,
+        explicit_path: @options[:config]
+      )
+      config = Config.new(config_path)
+
+      keyword_map = config.build_keyword_map
+      class_declaration_keywords = config.build_class_declaration_keywords(keyword_map)
+
       source = File.read(@filename, encoding: "UTF-8")
-      transpiler = Transpiler.new(source, filename: @filename)
+      transpiler = Transpiler.new(source, filename: @filename,
+                                  keyword_map: keyword_map,
+                                  class_declaration_keywords: class_declaration_keywords)
       ruby_code = transpiler.transpile
 
       if @options[:dump]
@@ -17,7 +29,8 @@ module JpRuby
         return
       end
 
-      Runtime.load!
+      # Load runtime with custom aliases
+      Runtime.load!(config.build_runtime_map)
 
       # Execute with original filename for error reporting
       # Line numbers are preserved because keyword replacement doesn't change line structure

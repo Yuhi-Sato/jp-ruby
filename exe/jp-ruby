@@ -17,6 +17,10 @@ parser = OptionParser.new do |opts|
     options[:eval] = code
   end
 
+  opts.on("--config FILE", "カスタムキーワード設定ファイルを指定する") do |file|
+    options[:config] = file
+  end
+
   opts.on("-v", "--version", "バージョンを表示する") do
     puts "jp-ruby #{JpRuby::VERSION}"
     exit
@@ -31,9 +35,19 @@ end
 parser.parse!
 
 if options[:eval]
-  transpiler = JpRuby::Transpiler.new(options[:eval], filename: "-e")
+  config_path = JpRuby::Config.discover(explicit_path: options[:config])
+  config = JpRuby::Config.new(config_path)
+
+  keyword_map = config.build_keyword_map
+  class_declaration_keywords = config.build_class_declaration_keywords(keyword_map)
+
+  transpiler = JpRuby::Transpiler.new(options[:eval], filename: "-e",
+                                      keyword_map: keyword_map,
+                                      class_declaration_keywords: class_declaration_keywords)
   ruby_code = transpiler.transpile
-  JpRuby::Runtime.load!
+
+  JpRuby::Runtime.load!(config.build_runtime_map)
+
   if options[:dump]
     puts ruby_code
   else

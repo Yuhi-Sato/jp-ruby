@@ -2,9 +2,9 @@
 
 module JpRuby
   module Keywords
-    # Japanese to Ruby keyword mapping
+    # Japanese to Ruby keyword mapping (default, immutable)
     # Sorted by length (longest first) to prevent partial matches during replacement
-    KEYWORD_MAP = {
+    DEFAULT_KEYWORD_MAP = {
       # 7+ chars
       "そうでなければ" => "elsif",
       "ブロック渡し?" => "block_given?",
@@ -93,7 +93,7 @@ module JpRuby
       "それ" => "it",
     }.sort_by { |k, _| -k.length }.to_h.freeze
 
-    # Keywords that declare class/module names
-    CLASS_DECLARATION_KEYWORDS = %w[クラス モジュール].freeze
+    # Default class declaration keywords
+    DEFAULT_CLASS_DECLARATION_KEYWORDS = %w[クラス モジュール].freeze
   end
 end

@@ -2,95 +2,113 @@
 
 module JpRuby
   module Runtime
-    def self.load!
-      # Kernel methods (available everywhere)
-      ::Kernel.module_eval do
-        alias_method :表示, :puts
-        alias_method :出力, :print
-        alias_method :検査, :p
-        alias_method :取得, :gets
-      end
+    # Default alias definitions: { "ClassName" => { "japanese" => "english", ... } }
+    DEFAULT_ALIASES = {
+      "Kernel" => {
+        "表示" => "puts",
+        "出力" => "print",
+        "検査" => "p",
+        "取得" => "gets",
+      },
+      "Array" => {
+        "それぞれ" => "each",
+        "変換" => "map",
+        "選択" => "select",
+        "除外" => "reject",
+        "畳み込み" => "reduce",
+        "並べ替え" => "sort",
+        "逆順" => "reverse",
+        "平坦化" => "flatten",
+        "一意" => "uniq",
+        "含む?" => "include?",
+        "追加" => "push",
+        "長さ" => "length",
+        "大きさ" => "size",
+        "最初" => "first",
+        "最後" => "last",
+        "空?" => "empty?",
+        "結合" => "join",
+        "個数" => "count",
+      },
+      "Hash" => {
+        "それぞれ" => "each",
+        "鍵一覧" => "keys",
+        "値一覧" => "values",
+        "長さ" => "length",
+        "含む?" => "include?",
+        "空?" => "empty?",
+        "結合" => "merge",
+        "削除" => "delete",
+      },
+      "String" => {
+        "長さ" => "length",
+        "大きさ" => "size",
+        "分割" => "split",
+        "含む?" => "include?",
+        "置換" => "gsub",
+        "大文字" => "upcase",
+        "小文字" => "downcase",
+        "除去" => "strip",
+        "空?" => "empty?",
+        "逆順" => "reverse",
+        "文字列変換" => "to_s",
+        "整数変換" => "to_i",
+        "小数変換" => "to_f",
+      },
+      "Integer" => {
+        "回" => "times",
+        "偶数?" => "even?",
+        "奇数?" => "odd?",
+        "文字列変換" => "to_s",
+        "小数変換" => "to_f",
+        "まで上" => "upto",
+        "まで下" => "downto",
+        "絶対値" => "abs",
+      },
+      "Float" => {
+        "整数変換" => "to_i",
+        "文字列変換" => "to_s",
+        "切り上げ" => "ceil",
+        "切り捨て" => "floor",
+        "四捨五入" => "round",
+        "絶対値" => "abs",
+      },
+      "Object" => {
+        "凍結" => "freeze",
+        "凍結済み?" => "frozen?",
+        "複製" => "dup",
+        "は?" => "is_a?",
+        "応答する?" => "respond_to?",
+      },
+    }.freeze
 
-      # Array methods
-      ::Array.class_eval do
-        alias_method :それぞれ, :each
-        alias_method :変換, :map
-        alias_method :選択, :select
-        alias_method :除外, :reject
-        alias_method :畳み込み, :reduce
-        alias_method :並べ替え, :sort
-        alias_method :逆順, :reverse
-        alias_method :平坦化, :flatten
-        alias_method :一意, :uniq
-        alias_method :含む?, :include?
-        alias_method :追加, :push
-        alias_method :長さ, :length
-        alias_method :大きさ, :size
-        alias_method :最初, :first
-        alias_method :最後, :last
-        alias_method :空?, :empty?
-        alias_method :結合, :join
-        alias_method :個数, :count
-      end
+    # Class name string to Ruby class mapping
+    CLASS_MAP = {
+      "Kernel" => ::Kernel,
+      "Array" => ::Array,
+      "Hash" => ::Hash,
+      "String" => ::String,
+      "Integer" => ::Integer,
+      "Float" => ::Float,
+      "Object" => ::Object,
+    }.freeze
 
-      # Hash methods
-      ::Hash.class_eval do
-        alias_method :それぞれ, :each
-        alias_method :鍵一覧, :keys
-        alias_method :値一覧, :values
-        alias_method :長さ, :length
-        alias_method :含む?, :include?
-        alias_method :空?, :empty?
-        alias_method :結合, :merge
-        alias_method :削除, :delete
-      end
+    # Kernel uses module_eval, others use class_eval
+    MODULE_EVAL_CLASSES = %w[Kernel].freeze
 
-      # String methods
-      ::String.class_eval do
-        alias_method :長さ, :length
-        alias_method :大きさ, :size
-        alias_method :分割, :split
-        alias_method :含む?, :include?
-        alias_method :置換, :gsub
-        alias_method :大文字, :upcase
-        alias_method :小文字, :downcase
-        alias_method :除去, :strip
-        alias_method :空?, :empty?
-        alias_method :逆順, :reverse
-        alias_method :文字列変換, :to_s
-        alias_method :整数変換, :to_i
-        alias_method :小数変換, :to_f
-      end
+    def self.load!(alias_map = nil)
+      alias_map ||= DEFAULT_ALIASES
 
-      # Integer methods
-      ::Integer.class_eval do
-        alias_method :回, :times
-        alias_method :偶数?, :even?
-        alias_method :奇数?, :odd?
-        alias_method :文字列変換, :to_s
-        alias_method :小数変換, :to_f
-        alias_method :まで上, :upto
-        alias_method :まで下, :downto
-        alias_method :絶対値, :abs
-      end
+      alias_map.each do |class_name, aliases|
+        target = CLASS_MAP.fetch(class_name) { Object.const_get(class_name) }
 
-      # Float methods
-      ::Float.class_eval do
-        alias_method :整数変換, :to_i
-        alias_method :文字列変換, :to_s
-        alias_method :切り上げ, :ceil
-        alias_method :切り捨て, :floor
-        alias_method :四捨五入, :round
-        alias_method :絶対値, :abs
-      end
+        eval_method = target.is_a?(Module) && !target.is_a?(Class) ? :module_eval : :class_eval
 
-      # Object methods (available on all objects)
-      ::Object.class_eval do
-        alias_method :凍結, :freeze
-        alias_method :凍結済み?, :frozen?
-        alias_method :複製, :dup
-        alias_method :は?, :is_a?
-        alias_method :応答する?, :respond_to?
+        target.send(eval_method) do
+          aliases.each do |japanese, english|
+            alias_method japanese.to_sym, english.to_sym
+          end
+        end
       end
     end
   end

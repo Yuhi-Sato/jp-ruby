@@ -22,4 +22,13 @@ module JpRuby
       super(message)
     end
   end
+
+  class ConfigError < Error
+    attr_reader :config_path
+
+    def initialize(message, config_path: nil)
+      @config_path = config_path
+      super(message)
+    end
+  end
 end
