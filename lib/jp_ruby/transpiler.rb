@@ -2,6 +2,8 @@
 
 module JpRuby
   class Transpiler
+    attr_reader :class_names
+
     def initialize(source, filename: "(jp-ruby)",
                    keyword_map: Keywords::DEFAULT_KEYWORD_MAP,
                    class_declaration_keywords: Keywords::DEFAULT_CLASS_DECLARATION_KEYWORDS)
@@ -9,15 +11,16 @@ module JpRuby
       @filename = filename
       @keyword_map = keyword_map
       @class_declaration_keywords = class_declaration_keywords
+      @class_names = []
     end
 
     def transpile
       tokens = Tokenizer.new(@source).tokenize
-      class_names = collect_class_names(tokens)
+      @class_names = collect_class_names(tokens)
 
       tokens.map do |token|
         if token.type == :word
-          replace_word(token.value, class_names)
+          replace_word(token.value, @class_names)
         else
           token.value
         end

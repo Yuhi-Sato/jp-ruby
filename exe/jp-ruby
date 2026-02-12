@@ -51,7 +51,17 @@ if options[:eval]
   if options[:dump]
     puts ruby_code
   else
-    eval(ruby_code, TOPLEVEL_BINDING, "-e", 1) # rubocop:disable Security/Eval
+    begin
+      eval(ruby_code, TOPLEVEL_BINDING, "-e", 1) # rubocop:disable Security/Eval
+    rescue SyntaxError => e
+      localized_message = JpRuby::ErrorLocalizer.localize(
+        e.message,
+        keyword_map: keyword_map,
+        class_names: transpiler.class_names
+      )
+      $stderr.puts "構文エラー: #{localized_message}"
+      exit 1
+    end
   end
 elsif ARGV.empty?
   puts parser

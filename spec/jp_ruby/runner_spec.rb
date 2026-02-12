@@ -425,5 +425,21 @@ RSpec.describe JpRuby::Runner do
     it "構文エラーでTranspileErrorを発生" do
       expect { run_jrb("定義\n終わり") }.to raise_error(JpRuby::TranspileError)
     end
+
+    it "構文エラーメッセージに日本語キーワードが含まれる" do
+      expect { run_jrb("定義\n終わり") }.to raise_error(JpRuby::TranspileError) do |error|
+        expect(error.message).to include("定義")
+        expect(error.message).to include("終わり")
+        expect(error.message).not_to match(/\|\s*def\b/)
+        expect(error.message).not_to match(/\|\s*end\b/)
+      end
+    end
+
+    it "クラス名のCプレフィックスがエラーメッセージから除去される" do
+      source = "クラス 犬\n定義\n終わり"
+      expect { run_jrb(source) }.to raise_error(JpRuby::TranspileError) do |error|
+        expect(error.message).not_to include("C犬")
+      end
+    end
   end
 end

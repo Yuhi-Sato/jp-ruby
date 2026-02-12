@@ -7,6 +7,7 @@ require_relative "jp_ruby/tokenizer"
 require_relative "jp_ruby/transpiler"
 require_relative "jp_ruby/runtime"
 require_relative "jp_ruby/config"
+require_relative "jp_ruby/error_localizer"
 require_relative "jp_ruby/runner"
 
 module JpRuby

@@ -36,8 +36,13 @@ module JpRuby
       # Line numbers are preserved because keyword replacement doesn't change line structure
       eval(ruby_code, TOPLEVEL_BINDING, @filename, 1) # rubocop:disable Security/Eval
     rescue SyntaxError => e
+      localized_message = ErrorLocalizer.localize(
+        e.message,
+        keyword_map: keyword_map,
+        class_names: transpiler&.class_names || []
+      )
       raise JpRuby::TranspileError.new(
-        "構文エラー: #{e.message}",
+        "構文エラー: #{localized_message}",
         filename: @filename,
         original_error: e
       )
