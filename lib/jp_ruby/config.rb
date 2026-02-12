@@ -81,6 +81,8 @@ module JpRuby
 
     def load_config(path)
       raw = YAML.safe_load(File.read(path, encoding: "UTF-8"))
+      return if raw.nil? || raw == false
+
       unless raw.is_a?(Hash)
         raise JpRuby::ConfigError, "設定ファイルの形式が正しくありません: #{path}"
       end
