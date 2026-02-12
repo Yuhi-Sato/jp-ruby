@@ -72,5 +72,10 @@ else
     $stderr.puts "エラー: ファイルが見つかりません: #{filename}"
     exit 1
   end
-  JpRuby::Runner.new(filename, options).run
+  begin
+    JpRuby::Runner.new(filename, options).run
+  rescue JpRuby::TranspileError => e
+    $stderr.puts e.message
+    exit 1
+  end
 end

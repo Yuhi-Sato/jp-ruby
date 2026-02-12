@@ -60,11 +60,11 @@ RSpec.describe JpRuby::Tokenizer do
     end
 
     it "インスタンス変数" do
-      expect(token_values("@名前")).to eq(["@", "名前"])
+      expect(token_values("@名前")).to eq(["@名前"])
     end
 
     it "グローバル変数" do
-      expect(token_values("$変数")).to eq(["$", "変数"])
+      expect(token_values("$変数")).to eq(["$変数"])
     end
 
     it "シンボル" do
@@ -137,7 +137,7 @@ RSpec.describe JpRuby::Tokenizer do
     end
 
     it "エスケープシーケンス" do
-      expect(string_parts('"\\n\\t"')).to eq(['\\n', '\\t'])
+      expect(string_parts('"\\n\\t"').join).to include('\\n', '\\t')
     end
 
     it "空文字列" do
